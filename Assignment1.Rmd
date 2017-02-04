@@ -1,0 +1,79 @@
+---
+title: "MIS40970 Assignment 1 Orange Juice Sales"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+1. Load the oj.csv data into R.
+```{r}
+oj <- read.csv(file="E:/Smurfit/Semester 2/DM/Week 2/oj.csv",head=TRUE,sep=",")
+summary(oj)
+```
+2. How many records and how many attributes are in the orange juice dataset?
+3. What is the mean, standard deviation and range of the price of orange juice?
+4. What is the median of the 'log of number of units sold' (logmove)?
+```{r}
+dim(oj)
+attributes(oj)
+mean(oj$price)
+sd(oj$price)
+range(oj$price)
+median(oj$logmove)
+```
+
+5. What are the names of the 3 orange juice brands? (Hint: brand is of type factor, and a factor is comprised of a number of ...<insert function name here!>...)
+```{r}
+unique(oj$brand)
+juicebrand<- factor(oj$brand)
+table(juicebrand)
+```
+6. Create a histogram of prices for each brand of orange juice.
+```{r}
+hist(oj$price[oj$brand=='tropicana'],main=" Price of Tropicana Orange Juice",xlab="Price",breaks =50, col = 'brown')
+hist(oj$price[oj$brand=='minute.maid'],main=" Price of Mindute Maid Orange Juice",xlab="Price",breaks =50,col='Red')
+hist(oj$price[oj$brand=='dominicks'],main=" Price of Dominicks Orange Juice",xlab="Price",breaks =50, col = 'blue')
+
+"Alternative Method Using ggplot2"
+library(ggplot2)
+ggplot(oj, aes(x= oj$price, fill = brand)) + geom_histogram(binwidth=1,position = "dodge")+ ylab("Count") +
+  xlab("Orange Juice Price") +
+  ggtitle("Prices of Orange Juice and Count of Each Type")
+```
+
+7. Generate a boxplot, which includes a separate plot for the prices of each brand (Hint: the boxplot should look something like the example below)
+```{r}
+boxplot(oj$price~oj$brand, data=oj, notch=TRUE, 
+  col=(c("gold","darkgreen")),main="Boxplot of Prices for each Orange Juince brand", xlab="Price and Brand name")
+```
+8. What does the boxplot tell us about the relative prices of each brand?
+(Hint: answer this one by interpreting what you observe in the boxplot,
+i.e., no coding required!).
+
+9. Generate a scatterplot of the logmove compared to price, and color
+the points according to their brand (e.g., "red" for brand 1, "green"
+for brand 2 etc).
+```{r}
+library(scatterplot3d)
+attach(oj)
+pairs(~logmove+price, pch=21,main="Scatter plot of Log of the number of units Sold vs Price of Orange Juice",bg= c("red", "blue", "yellow")[unclass(brand)])
+
+plot(logmove,price, xlab="Units Sold",ylab="Price",pch=21,col=topo.colors(3)[unclass(brand)])
+legend("bottomleft", inset=0.01, title="Brands",c("Tropicana","Minute Maid","Dominicks"), fill=topo.colors(3), horiz=FALSE)
+```
+10. Based on what you observe in the scatterplot, what can we say about
+the price of each brand of chilled orange juice and the volume of sales?
+11. Calculate the mean price of orange juice sold each week, and create a
+line plot of this timeseries. (Hint: use tapply(), and an example plot
+is provided below.)
+
+```{r}
+tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE)
+xnames <- names(tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE))
+plot(tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE),xaxt="n",pch=16)
+```
+12. Extract the mean weekly price of orange juice sold each week according
+to each brand (Hint: use tapply() with a list for the INDEX)
+```{r}
+```
+
+
