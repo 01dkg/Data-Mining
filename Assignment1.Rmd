@@ -1,33 +1,43 @@
 ---
 title: "MIS40970 Assignment 1 Orange Juice Sales"
 output:
-  pdf_document: default
   html_notebook: default
+  pdf_document:
+    number_sections: yes
+    toc: yes
 ---
-1. Load the oj.csv data into R.
+##1. Load the oj.csv data into R.
 ```{r}
-oj <- read.csv(file="E:/Smurfit/Semester 2/DM/Week 2/oj.csv",head=TRUE,sep=",")
+options(warn = 1)
+oj <- read.csv(file="E:\Smurfit\Semester 2\DM\R\Data-Mining",head=TRUE,sep=",")
 summary(oj)
 ```
-2. How many records and how many attributes are in the orange juice dataset?
-3. What is the mean, standard deviation and range of the price of orange juice?
-4. What is the median of the 'log of number of units sold' (logmove)?
+##2. How many records and how many attributes are in the orange juice dataset?
+
+
 ```{r}
 dim(oj)
-attributes(oj)
+names(oj)
+```
+##3. What is the mean, standard deviation and range of the price of orange juice?
+```{r}
 mean(oj$price)
 sd(oj$price)
 range(oj$price)
+```
+
+##4. What is the median of the 'log of number of units sold' (logmove)?
+```{r}
 median(oj$logmove)
 ```
 
-5. What are the names of the 3 orange juice brands? (Hint: brand is of type factor, and a factor is comprised of a number of ...<insert function name here!>...)
+##5. What are the names of the 3 orange juice brands? (Hint: brand is of type factor, and a factor is comprised of a number of ...<insert function name here!...)
 ```{r}
 unique(oj$brand)
 juicebrand<- factor(oj$brand)
 table(juicebrand)
 ```
-6. Create a histogram of prices for each brand of orange juice.
+##6. Create a histogram of prices for each brand of orange juice.
 ```{r}
 hist(oj$price[oj$brand=='tropicana'],main=" Price of Tropicana Orange Juice",xlab="Price",breaks =50, col = 'brown')
 hist(oj$price[oj$brand=='minute.maid'],main=" Price of Mindute Maid Orange Juice",xlab="Price",breaks =50,col='Red')
@@ -40,16 +50,16 @@ ggplot(oj, aes(x= oj$price, fill = brand)) + geom_histogram(binwidth=1,position 
   ggtitle("Prices of Orange Juice and Count of Each Type")
 ```
 
-7. Generate a boxplot, which includes a separate plot for the prices of each brand (Hint: the boxplot should look something like the example below)
+##7. Generate a boxplot, which includes a separate plot for the prices of each brand (Hint: the boxplot should look something like the example below)
 ```{r}
 boxplot(oj$price~oj$brand, data=oj, notch=TRUE, 
   col=(c("gold","darkgreen")),main="Boxplot of Prices for each Orange Juince brand", xlab="Price and Brand name")
 ```
-8. What does the boxplot tell us about the relative prices of each brand?
+##8. What does the boxplot tell us about the relative prices of each brand?
 (Hint: answer this one by interpreting what you observe in the boxplot,
 i.e., no coding required!).
 
-9. Generate a scatterplot of the logmove compared to price, and color
+##9. Generate a scatterplot of the logmove compared to price, and color
 the points according to their brand (e.g., "red" for brand 1, "green"
 for brand 2 etc).
 ```{r}
@@ -60,20 +70,99 @@ pairs(~logmove+price, pch=21,main="Scatter plot of Log of the number of units So
 plot(logmove,price, xlab="Units Sold",ylab="Price",pch=21,col=topo.colors(3)[unclass(brand)])
 legend("bottomleft", inset=0.01, title="Brands",c("Tropicana","Minute Maid","Dominicks"), fill=topo.colors(3), horiz=FALSE)
 ```
-10. Based on what you observe in the scatterplot, what can we say about
+```{r}
+library(plotly)
+Sys.setenv("plotly_username"="deepak91g")
+Sys.setenv("plotly_api_key"="Gb3tMDu2UzMuGdXsMB9n")
+
+p <- plot_ly(data = oj, x = ~logmove, y = ~price, color = ~brand, colors = "Set1")
+
+# Create a shareable link to your chart
+# Set up API credentials: https://plot.ly/r/getting-started
+chart_link = plotly_POST(p, filename="colorbrewer")
+chart_link
+```
+
+##10. Based on what you observe in the scatterplot, what can we say about
 the price of each brand of chilled orange juice and the volume of sales?
-11. Calculate the mean price of orange juice sold each week, and create a
+##11. Calculate the mean price of orange juice sold each week, and create a
 line plot of this timeseries. (Hint: use tapply(), and an example plot
 is provided below.)
 
+Note: Using tapply() method here
+
 ```{r}
-tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE)
-xnames <- names(tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE))
-plot(tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE),xaxt="n",pch=16)
+xnames <- tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE)
+plot(tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE),xaxt="n",pch=16,type="l",col="green",xlab = "Week",ylab="meanweeklyprice")
 ```
-12. Extract the mean weekly price of orange juice sold each week according
+NOTE: Answer to question 11, using aggreagate method
+```{r}
+meanweeklyprice <- aggregate(oj[ ,6], list(oj$week), mean)
+plot(meanweeklyprice$Group.1,meanweeklyprice$x,type="l",col="green",xlab = "Week",ylab="meanweeklyprice")
+
+```
+##12. Extract the mean weekly price of orange juice sold each week according
 to each brand (Hint: use tapply() with a list for the INDEX)
 ```{r}
+#Solution :1 using aggregate()
+mean_weekly_brand_price <- aggregate(oj[ ,6], list(Brand=oj$brand,Week=oj$week), mean)
+mean_weekly_brand_price
+#Solution :2 using tapply()
+weekly_brand_price<-tapply(oj$price,list(Week=oj$week,oj$brand),FUN=mean,na.rm=TRUE)
+weekly_brand_price
 ```
+
+##13. Create a plot which compares the mean weekly price of orange juice
+for all brands versus each individual brand.
+```{r}
+weekly_brand_price<-tapply(oj$price,list(Week=oj$week,oj$brand),FUN=mean,na.rm=TRUE)
+allbrand <- tapply(oj$price,list(Week=oj$week),FUN=mean,na.rm=TRUE)
+df <- cbind(allbrand,weekly_brand_price)
+write.table(df, file = 'q13.csv',sep = ",",row.names = T)
+library(readr)
+q13 <- read_csv("E:/Smurfit/Semester 2/DM/R/Data-Mining/q13.csv", 
+    col_names = FALSE, skip = 1)
+ggplot(q13, aes(q13$X1)) + 
+  geom_line(aes(y = q13$X2, colour = "All Brand")) + 
+  geom_line(aes(y = q13$X3, colour = "Dominicks")) + 
+  geom_line(aes(y = q13$X4, colour = "Minute Maid")) + 
+  geom_line(aes(y = q13$X5, colour = "Tropicana")) + xlab("Week") +ylab("Price")+
+  ggtitle("Weekly price of Orange Juice for All Brands vs Individual Brand")
+```
+
+
+##14.When there is an advertising campaign for orange juice does it impact on the number of units sold? (Hint: use factor() to ensure feat is a factor! and use tapply as per the last question).
+```{r}
+adcap <- factor(oj$feat)
+tapply(oj$logmove,adcap,FUN=mean,na.rm=TRUE)
+```
+## 15. Can you create a line plot of the mean weekly units sold without a promotion overlayed with the mean weekly units sold with a promotion? What is interesting about this plot?
+
+Answer: With a promotion more number of units sold as compared to campaign without a promotion 
+```{r}
+options(warn = -1)
+unitsold<-tapply(logmove,list(oj$week),FUN=mean,na.rm=TRUE)
+head(unitsold)
+sold <- tapply(oj$logmove,list(Week=oj$week,oj$feat),FUN=mean,na.rm=TRUE)
+df <- cbind(sold)
+write.table(df, file = 'q15.csv',sep = ",",row.names = T)
+library(readr)
+q15 <- read_csv("E:/Smurfit/Semester 2/DM/R/Data-Mining/q15.csv", 
+    col_names = FALSE, skip = 1)
+ggplot(q15, aes(q13$X1,xlab="Week")) + 
+  geom_line(aes(y = q13$X2, colour = "With promotion")) + 
+  geom_line(aes(y = q13$X3, colour = "Without promotion"))+ xlab("Week") +ylab("Units Sold")+
+  ggtitle("Mean weekly units sold with a promotion vs without promotion") 
+```
+##16.Consider the demographic and competitive variables1. Using descriptive analytics are there patterns you can observe that might suggest the potential for proling individual stores or customers, which might then be used for marketing purposes?
+```{r}
+
+```
+
+
+
+
+
+
 
 
