@@ -9,6 +9,7 @@ output:
     fig_width: 16
     number_sections: yes
     toc: yes
+    toc_depth: 4
   html_notebook:
     fig_caption: yes
     fig_height: 12
@@ -34,8 +35,15 @@ oj <- read.csv(file="oj.csv",head=TRUE,sep=",")
 summary(oj)
 ```
 #How many records and how many attributes are in the orange juice dataset?
+
+There are 28947 records and 17 attributes.
 ```{r}
+#Method 1
 dim(oj)
+
+#Method 2
+nrow(oj)
+ncol(oj)
 names(oj)
 ```
 #What is the mean, standard deviation and range of the price of orange juice?
@@ -46,18 +54,28 @@ range(oj$price)
 ```
 
 #What is the median of the 'log of number of units sold' (logmove)?
+Median is 9.03408
 ```{r}
 median(oj$logmove)
 ```
 
 #What are the names of the 3 orange juice brands?
+* Juice Brands are: 
+  1. Dominicks
+  2. Minute.maid
+  3. Tropicana
 ```{r}
+#Method 1
 unique(oj$brand)
+
+#Method 2
 juicebrand<- factor(oj$brand)
 table(juicebrand)
 ```
 
 # Create a histogram of prices for each brand of orange juice.
+
+##Method 1: using hist()
 ```{r}
 library(lattice)
 par(mfrow = c(3,1))
@@ -68,7 +86,8 @@ hist(oj$price[oj$brand=='minute.maid'],main=" Price of Mindute Maid Orange Juice
 hist(oj$price[oj$brand=='dominicks'],main=" Price of Dominicks Orange Juice"
      ,xlab="Price",breaks =50, col = 'blue')
 ```
-##Alternative Method Using ggplot2
+
+##Method 2: Using ggplot2()
 ```{r results='hide', message=FALSE, warning=FALSE}
 library(ggplot2)
 par(mfrow = c(3,3))
@@ -76,6 +95,10 @@ ggplot(oj, aes(x= oj$price, fill = brand)) + geom_histogram(binwidth=0.25,positi
 ylab("Count") + xlab("Orange Juice Price") + ggtitle("Prices of Orange Juice and 
                                                      Count of Each Type")
 
+```
+
+##Method 3: Using histogram()
+```{r results='hide', message=FALSE, warning=FALSE}
 histogram(~price|brand,data=oj,layout=c(3,1))
 densityplot(~price|brand,data=oj,layout=c(3,1),plot.points=FALSE)
 ```
@@ -97,19 +120,25 @@ quartile. Also, majority of price range of Dominick's is more than the median va
 - Tropicana has few outliers closer to the minimum of lower quartile whiskers. Overall, with the help of boxplot, one can interpret the distribution of figure around quartile of a median value. That will help a user to identify outlier values and then perform detailed data analysis to find trends and pattern among datasets.
 
 #Generate a scatterplot of the logmove compared to price, and color the points according to their brand 
+
+## Method 1: Using pairs()
 ```{r results='hide', message=FALSE, warning=FALSE}
 library(scatterplot3d)
 attach(oj)
 pairs(~oj$logmove+oj$price, pch=21,
       main="Scatter plot of Log of the number of units Sold vs Price of Orange Juice",
       bg= c("red", "blue", "yellow")[unclass(oj$brand)])
+```
 
+## Method 2: Using plot()
+```{r results='hide', message=FALSE, warning=FALSE}
 plot(oj$logmove,oj$price, xlab="Units Sold",ylab="Price",pch=21,col=topo.colors(3)
      [unclass(oj$brand)])
 legend("bottomleft", inset=0.01, title="Brands",c("Tropicana","Minute Maid","Dominicks"),
        fill=topo.colors(3), horiz=FALSE)
 ```
-![Scatter Plot using Ploty library](E:/Smurfit/Semester 2/DM/R/Data-Mining/plotly_scatter.png)
+
+##Method 3: Using plotly()
 ```{r results='hide', message=FALSE, warning=FALSE}
 library(plotly)
 Sys.setenv("plotly_username"="deepak91g")
@@ -122,6 +151,8 @@ Sys.setenv("plotly_api_key"="Gb3tMDu2UzMuGdXsMB9n")
 #chart_link = plotly_POST(p, filename="colorbrewer")
 #chart_link
 ```
+![Scatter Plot using Ploty library](E:/Smurfit/Semester 2/DM/R/Data-Mining/plotly_scatter.png)
+
 #Based on what you observe in the scatterplot, what can we say about the price of each brand of chilled orange juice and the volume of sales?
 
 * Scatterplot helps one to identify the relation between two variables if one changes then how the change in other is
@@ -137,12 +168,13 @@ minmum number of unit sold is 4.
 
 #Calculate the mean price of orange juice sold each week, and create aline plot of this timeseries. 
 
+## Method 1: using tapply()
 ```{r}
 xnames <- tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE)
 plot(tapply(oj$price,oj$week,FUN=mean,na.rm=TRUE),xaxt="n",pch=16,type="l",
      col="green",xlab = "Week",ylab="meanweeklyprice")
 ```
-NOTE: Answer to question 11, using aggreagate method
+##Method 2: using aggreagate()
 ```{r}
 meanweeklyprice <- aggregate(oj[ ,6], list(oj$week), mean)
 plot(meanweeklyprice$Group.1,meanweeklyprice$x,type="l",col="green",
@@ -150,14 +182,16 @@ plot(meanweeklyprice$Group.1,meanweeklyprice$x,type="l",col="green",
 
 ```
 
-#Extract the mean weekly price of orange juice sold each week according to each brand 
+#Extract the mean weekly price of orange juice sold each week according to each brand. 
+
+##Method 1: using aggregate()
 ```{r}
-#Solution :1 using aggregate()
 mean_weekly_brand_price <- aggregate(oj[ ,6], list(Brand=oj$brand,Week=oj$week), mean)
 #mean_weekly_brand_price  #Uncomment this to view full data frame
 head(mean_weekly_brand_price)
-
-#Solution :2 using tapply()
+```
+##Method :2 using tapply()
+```{r}
 weekly_brand_price<-tapply(oj$price,list(Week=oj$week,oj$brand),FUN=mean,na.rm=TRUE)
 #weekly_brand_price  #Uncomment this to view full data frame
 head(weekly_brand_price)
@@ -256,7 +290,9 @@ print(stats_data)
 
 ##Scatter Plot Matrices in R
 
-###Analysis of Correlation among demographics variables. The closer correlation coeff(r) is to +1 or -1, the more closely the two variables are related. If r is close to 0, it means there is no relationship between the variables. Below are few sample correlated variables.
+###Analysis of Correlation among demographics variables. 
+
+The closer correlation coeff(r) is to +1 or -1, the more closely the two variables are related. If r is close to 0, it means there is no relationship between the variables. Below are few sample correlated variables.
 
 #### 1. Positive Correlations:
         1. EDUC ~ CPWVOL5
