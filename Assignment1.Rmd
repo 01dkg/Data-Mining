@@ -8,6 +8,7 @@ output:
     fig_height: 6.5
     fig_width: 16
     number_sections: yes
+    toc: yes
   html_notebook:
     fig_caption: yes
     fig_height: 12
@@ -88,10 +89,12 @@ boxplot(oj$price~oj$brand, data=oj, notch=TRUE,
 
 #What does the boxplot tell us about the relative prices of each brand?
 
--Dominicks sas outlier less than 3/2 times of lower quartile. one outlier is more than 3/2 time of upper quartile. Also, majority of price range of Dominicks is more than the median value and it has range of 1.6 to 2 (approx)
--Minute.maid has about 5 outlier less than 3/2 times of lower quartile.
--Tropicana has few outliers closer to the minmium of lower quartile whiskers.
-Overall, with the help of boxplot, one can interepret the distribution of figure around quartile of a median value. That will help user to identify outlier values and then perform detailed data analysis to find trends and pattern among datasets.
+- Dominick's has outlier less than 3/2 times of lower quartile. one outlier is more than 3/2 time of upper
+quartile. Also, majority of price range of Dominick's is more than the median value and it has range of 1.6 to 2 (approx)
+
+- Minute.maid has about 5 outliers less than 3/2 times of lower quartile.
+
+- Tropicana has few outliers closer to the minimum of lower quartile whiskers. Overall, with the help of boxplot, one can interpret the distribution of figure around quartile of a median value. That will help a user to identify outlier values and then perform detailed data analysis to find trends and pattern among datasets.
 
 #Generate a scatterplot of the logmove compared to price, and color the points according to their brand 
 ```{r results='hide', message=FALSE, warning=FALSE}
@@ -121,11 +124,16 @@ Sys.setenv("plotly_api_key"="Gb3tMDu2UzMuGdXsMB9n")
 ```
 #Based on what you observe in the scatterplot, what can we say about the price of each brand of chilled orange juice and the volume of sales?
 
-Scatterplot help one to identify the relation among two variables, if one changes then how change in other is reflected. It could be no change, increase or decrease in the value. Similarly, for orange juice data, scatterplot of Units Sold vs Price shows that the Price of tropicana juice is lowered compared to other two, and sold more number of units compared to Minute Maid and Dominicks. 
+* Scatterplot helps one to identify the relation between two variables if one changes then how the change in other is
+reflected. It could be no change, increase or decrease in the value. Similarly, for orange juice data, the scatterplot
+of Units Sold vs Price shows that the Price of Tropicana juice is lowered compared to other two, and sold
+the number of units compared to Minute Maid and Dominicks.
 
-Dominicks has sold units in range of 7-11, but its price is highest among all three brands. On the otherhand, minute maid unit sold is between 8-12, and average price per unit is 2.5.
+* Dominicks has sold units in range of 7-11, but its price is highest among all three brands. On the other hand,
+minute maid unit sold is between 8-12, and average price per unit is 2.5.
 
-Overall, Maximum price of a unit juice is 4.0 and minimum price is approx 1.0. Max unit sold is 14 and minmum number of unit sold is 4.
+* Overall, Maximum price of a unit juice is 4.0 and minimum price is approx 1.0. Max unit sold is 14 and
+minmum number of unit sold is 4.
 
 #Calculate the mean price of orange juice sold each week, and create aline plot of this timeseries. 
 
@@ -199,6 +207,20 @@ ggplot(q15, aes(q13$X1,xlab="Week")) +
 
 #Descriptive Analytics
 Consider the demographic and competitive variables1. Using descriptive analytics are there patterns you can observe that might suggest the potential for profiling individual stores or customers, which might then be used for marketing purposes?
+
+## Answer: Yes, there are patterns among demographics variables, which can be use for marketing of orange juice at given stores.
+
+1. Data Cleaning: This help in identifying and removing duplicate records along with outlier, which might diverge business decision.
+
+2. Descriptive Analytics: Using this one understand the behaviour, size, and range etc about data points.
+
+3. Correlations: One can use highly correlated variables into account while forming a new marketing strategy. Such as, in given data, EDUC and HVAL150 are very much related to each other, this give us an insight that potential customer who are well educated also lives in an expensive house and vice verse. Similarly, HVAL150, INCOME and EDUC also correlated with each other. 
+
+4. Distribution: By plotting probability distribution of chart, one can figure out the probability of future business decision outcome.
+
+5. Store Rating: Using statistical analysis, one can identify the best and worst store, also can rate each store depending on units sold by them. It is found that store 75 is poorest and store 62 is the wealthiest store among 83 stores.
+
+6. Linear Models: By generating linear models of each variable, one can analysis the trend of data, which will help in forecasting future trend as well.
 
 ## Overview
 
@@ -339,6 +361,8 @@ summary(mlow)
 plot(logmove~price,data=oj2,xlim=c(0,4),ylim=c(0,13),main="75= Poorest Store")
 abline(mlow)
 ```
+# Linear Regression Models
+
 [Reference UCLA.EDU](http://www.ats.ucla.edu/stat/r/pages/looping_strings.htm)
 
 ```{r}
@@ -351,3 +375,4 @@ models <- lapply(varlist, function(x) {
 par(mfrow = c(2, 2))
 invisible(lapply(models, plot))
 ```
+ 
